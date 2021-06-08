@@ -34,7 +34,7 @@ class RHESSISlicingMixin(NDSlicingMixin):
 
 class RHESSI(RHESSISlicingMixin):
     """
-    This is the baseclass for RHESSI imaging spectroscopy data. (Specifically that which is prepped by P.J.A.S as I have no idea if there's a standard for this kind of thing). RHESSI imaging spectroscopy data consists of a 2D field-of-view integrated in time for a certain number of energy ranges. All of this can be found in the object.
+    This is the baseclass for RHESSI imaging spectroscopy data. (Specifically that which is prepped by P.J.A.S. as I have no idea if there's a standard for this kind of thing). RHESSI imaging spectroscopy data consists of a 2D field-of-view integrated in time for a certain number of energy ranges. All of this can be found in the object.
 
     Parameters
     ----------
