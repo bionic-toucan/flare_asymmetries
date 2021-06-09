@@ -1,3 +1,4 @@
+import enum
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -8,6 +9,8 @@ import astropy.units as u
 from sunpy.coordinates import Helioprojective
 from crispy.utils import ObjDict
 import datetime
+from reproject import reproject_exact
+from tqdm import tqdm
 
 class RHESSISlicingMixin(NDSlicingMixin):
     """
@@ -69,6 +72,10 @@ class RHESSI(RHESSISlicingMixin):
     @property
     def header(self):
         return self.file.header
+
+    @property
+    def shape(self):
+        return self.file.data.shape
     
     @property
     def E(self):
@@ -233,3 +240,30 @@ class RHESSI(RHESSISlicingMixin):
                     return sc.Tx.value, sc.Ty.value
                 else:
                     raise NotImplementedError("Too many or too little dimensions.")
+
+def rhessi_reproject(rhessi, crisp, derot=False):
+    """
+    This function is used to reproject the RHESSI data onto the CRISP frame using an exact method of `flux-conserving spherical polygon intersection <http://montage.ipac.caltech.edu/docs/algorithms.html>`_.
+
+    Parameters
+    ----------
+    rhessi : RHESSI
+        The object of the RHESSI observations to reproject.
+    crisp : crispy.crisp.CRISP
+        The CRISP observsations containing the WCS to reproject the RHESSI observations onto.
+    derot : bool, optional
+        Whether or not the crisp data needs to be derotated before the reprojection is performed.
+
+    Returns
+    -------
+    rhessi_new : numpy.ndarray
+        The RHESSI data reprojected onto the CRISP WCS.
+    """
+    if derot:
+        crisp.reconstruct_full_frame()
+
+    rhessi_new = np.zeros((rhessi.shape[-3], crisp.shape[-2], crisp.shape[-1]))
+    for j, r in enumerate(tqdm(rhessi.data)):
+        rhessi_new[j], _ = reproject_exact((r, rhessi[j].wcs), crisp[0].wcs, shape_out=crisp[0].shape)
+
+    return rhessi_new
