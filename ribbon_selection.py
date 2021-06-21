@@ -97,7 +97,7 @@ def kmeans_ribbons(labels, ribb_clust=0):
 
     return ribbon_labels.reshape(labels.shape)
 
-def dbscan_ribbons(ribbon_labels, min_samples=100, eps=0.1):
+def dbscan_ribbons(ribbon_labels, min_samples=100, eps=0.1, metric="euclidean"):
     """
     A function to perform the DBSCAN on the flare ribbon locations to eliminate noise and locate exactly where flare ribbons are (and separation of multiple flare ribbons).
 
@@ -117,7 +117,7 @@ def dbscan_ribbons(ribbon_labels, min_samples=100, eps=0.1):
     dbribs_img : numpy.ndarray
         An array containing each KMeans-identified flare spectra with its associated DBSCAN cluster label in its rightful spatial location. Points that were not clustered by DBSCAN are represented by NaNs.
     """
-    dbscan = DBSCAN(min_samples=min_samples, eps=eps)
+    dbscan = DBSCAN(min_samples=min_samples, eps=eps, metric=metric)
 
     db_ribbons = []
     flat_ribbs = ribbon_labels.flatten()
