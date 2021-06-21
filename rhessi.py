@@ -1,4 +1,3 @@
-import enum
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -111,11 +110,18 @@ class RHESSI(RHESSISlicingMixin):
         h = fn.header
         rwcs = WCS(h)
 
-        rwcs.wcs.ctype = ["HPLN-TAN", "HPLT-TAN", "Energy"]
-        rwcs.wcs.cunit = ["arcsec", "arcsec", "keV"]
-        rwcs.wcs.crval = [h["XCEN"], h["YCEN"], h["NAXIS3"]//2]
-        rwcs.wcs.crpix = [h["NAXIS1"]//2, h["NAXIS2"]//2, h["NAXIS3"]//2]
-        rwcs.wcs.cdelt = [h["CDELT1"], h["CDELT2"], 1.0]
+        if len(self.shape) == 4:
+            rwcs.wcs.ctype = ["HPLN-TAN", "HPLT-TAN", "Energy", "Time"]
+            rwcs.wcs.cunit = ["arcsec", "arcsec", "keV", "UTC"]
+            rwcs.wcs.crval = [h["XCEN"], h["YCEN"], h["NAXIS3"]//2, h["NAXIS4"]//2]
+            rwcs.wcs.crpix = [h["NAXIS1"]//2, h["NAXIS2"]//2, h["NAXIS3"]//2, h["NAXIS4"]//2]
+            rwcs.wcs.cdelt = [h["CDELT1"], h["CDELT2"], 1.0, 1.0]
+        else:
+            rwcs.wcs.ctype = ["HPLN-TAN", "HPLT-TAN", "Energy"]
+            rwcs.wcs.cunit = ["arcsec", "arcsec", "keV"]
+            rwcs.wcs.crval = [h["XCEN"], h["YCEN"], h["NAXIS3"]//2]
+            rwcs.wcs.crpix = [h["NAXIS1"]//2, h["NAXIS2"]//2, h["NAXIS3"]//2]
+            rwcs.wcs.cdelt = [h["CDELT1"], h["CDELT2"], 1.0]
 
         return rwcs
     
